@@ -1,4 +1,4 @@
-# DaBot
+# trofiebot 
 
 IRC chat bot for Twitch.tv writen in Go.
 
