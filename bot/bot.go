@@ -1,12 +1,11 @@
-package main
+package bot
 
 import (
+        "bufio"
         "fmt"
         "net"
-        "os"
-        "io/ioutil"
-        "bufio"
         "net/textproto"
+        "os"
         "strings"
         "time"
 )
@@ -29,7 +28,7 @@ func NewBot() *Bot {
                 port:       "6667",
                 name:       "trofiebot",
                 channel:    "#3ygun",
-                autoMsg:    "Hit me with some pasta",
+                autoMsg:    "Let's play emotemon! BibleThump",
                 conn:       nil,
         }
 }
@@ -41,11 +40,24 @@ func (bot *Bot) Connect() {
     var err error
     fmt.Printf("Connecting to %s channel\n", bot.channel)
     bot.conn, err = net.Dial("tcp", bot.server+":"+bot.port)
+    fmt.Printf("before %s\n", bot.channel)
     if err != nil {
         fmt.Printf("Cannot connect to channel, retrying")
         bot.Connect()
     }
     fmt.Printf("Connected to IRC server %s\n", bot.server)
+}
+
+func (bot *Bot) Close() {
+    bot.conn.Close()
+    fmt.Printf("Closed connection from %s\n", bot.server)
+}
+
+func (bot *Bot) LogIn(pass string) {
+    //join channel
+    fmt.Fprintf(bot.conn, "PASS %s\r\n", pass)
+    fmt.Fprintf(bot.conn, "NICK %s\r\n", bot.name)
+    fmt.Fprintf(bot.conn, "JOIN %s\r\n", bot.channel)
 }
 
 /*
@@ -103,6 +115,35 @@ If duration sent is < 0, permanently ban
 //     bot.Message(msg)
 // }
 
+func (bot *Bot) HandleChat()  {
+
+    //Creates the chat reader
+    proto := textproto.NewReader(bufio.NewReader(bot.conn))
+
+    for {
+        line, err := proto.ReadLine()
+        if err != nil {
+            break
+        }
+
+        fmt.Printf("Read line %s \r\n", line)
+
+        if strings.Contains(line, "PING") {
+            pongResponse := strings.Split(line, "PING ")
+            bot.Message("PONG " + pongResponse[1] + "\r\n")
+        } else if strings.Contains(line, ".tmi.twitch.tv PRIVMSG " + bot.channel) {
+            userdata := strings.Split(line, ".tmi.twitch.tv PRIVMSG " + bot.channel)
+            username := strings.Split(userdata[0], "@")
+            usermessage := strings.Replace(userdata[1], " :", "", 1)
+            fmt.Printf(username[1] + ": " + usermessage + "\n")
+            if strings.Contains(usermessage, "Kappa") {
+                bot.Message(username[1] + " caught a Kappa")
+            }
+        }
+    }
+}
+
+/*
 func main() {
     ircbot := NewBot()
     go ircbot.ConsoleInput()
@@ -146,7 +187,7 @@ func main() {
             pongResponse := strings.Split(line, "PING ")
             fmt.Fprintf(ircbot.conn, "PONG %s\r\n", pongResponse[1])
         } else if strings.Contains(line, ".tmi.twitch.tv PRIVMSG " + ircbot.channel) {
-            
+
             userdata := strings.Split(line, ".tmi.twitch.tv PRIVMSG " + ircbot.channel)
             username := strings.Split(userdata[0], "@")
             usermessage := strings.Replace(userdata[1], " :", "", 1)
@@ -158,3 +199,4 @@ func main() {
         }
     }
 }
+*/
