@@ -73,35 +73,42 @@ func (bot *Bot) ConsoleInput() {
 	}
 }
 
+func (bot *Bot) AutoMessage() {
+    for {
+        bot.Message("30 seconds has passed")
+        time.Sleep(30 * time.Second)
+    }
+}
+
 /*
 Sends timeout duration to bot.Ban
 */
-func (bot *Bot) Timeout(user, reason, duration) {
-    if duration == 0 {
-        return
-    }
-    go bot.Ban(user, reason, duration)
-}
+// func (bot *Bot) Timeout(user, reason, duration) {
+//     if duration == 0 {
+//         return
+//     }
+//     go bot.Ban(user, reason, duration)
+// }
 
 /*
 Ban's the user from twitch chat
 If duration sent is < 0, permanently ban
 */
-func (bot *Bot) Ban(user, reason, duration) {
-    if duration == -1 {
-        msg := fmt.Fprintf(".ban %s for %s", user, reason)
-    }
-    msg := fmt.Fprintf(".timeout %s for %s", user, reason)
-    time.Sleep(1 * time.Second)
-    bot.Message(msg)
-}
+// func (bot *Bot) Ban(user, reason, duration) {
+//     if duration == -1 {
+//         msg := fmt.Fprintf(".ban %s for %s", user, reason)
+//     }
+//     msg := fmt.Fprintf(".timeout %s for %s", user, reason)
+//     time.Sleep(1 * time.Second)
+//     bot.Message(msg)
+// }
 
 func main() {
     ircbot := NewBot()
     go ircbot.ConsoleInput()
     ircbot.Connect()
 
-    parser := bufio.NewReader(irc.conn)
+    parser := bufio.NewReader(ircbot.conn)
     proto := textproto.NewReader(parser)
 
     pass1, err := ioutil.ReadFile("twitch_pass.txt")
@@ -119,20 +126,35 @@ func main() {
     fmt.Printf("Inserted information to server...\n")
 	fmt.Printf("If you don't see the stream chat it probably means the Twitch oAuth password is wrong\n")
 	fmt.Printf("Channel: " + ircbot.channel + "\n")
+
+    go ircbot.AutoMessage()
+
 	defer ircbot.conn.Close()
 
-    for {
-        ircbot.Message(ircbot.autoMsg)
-        time.Sleep(30 * time.Second)
+    ircbot.Message("A wild Kappa has appeared with CP 1")
 
+    for {
         line, err := proto.ReadLine()
         if err != nil {
             break
         }
 
+        fmt.Printf("Read line %s \r\n", line)
+
+
         if strings.Contains(line, "PING") {
             pongResponse := strings.Split(line, "PING ")
             fmt.Fprintf(ircbot.conn, "PONG %s\r\n", pongResponse[1])
+        } else if strings.Contains(line, ".tmi.twitch.tv PRIVMSG " + ircbot.channel) {
+            
+            userdata := strings.Split(line, ".tmi.twitch.tv PRIVMSG " + ircbot.channel)
+            username := strings.Split(userdata[0], "@")
+            usermessage := strings.Replace(userdata[1], " :", "", 1)
+            fmt.Printf(username[1] + ": " + usermessage + "\n")
+
+            if strings.Contains(usermessage, "Kappa") {
+                ircbot.Message(username[1] + " caught a Kappa")
+            }
         }
     }
 }
