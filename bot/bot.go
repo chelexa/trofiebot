@@ -74,7 +74,7 @@ func (bot *Bot) Message(message string) {
 	if message == "" {
 		return
 	}
-	fmt.Printf("printing message: %s\r\n", message)
+	fmt.Printf("Got msg >    %s\r\n", message)
 	fmt.Fprintf(bot.conn, "PRIVMSG "+bot.channel+" :"+message+"\r\n")
 }
 
@@ -122,7 +122,8 @@ func (bot *Bot) HandleChat() {
 
 		if strings.Contains(line, "PING") {
 			pongResponse := strings.Split(line, "PING ")
-			bot.Message("PONG " + pongResponse[1] + "\r\n")
+			fmt.Printf("Got msg >    %s\r\n", pongResponse[1])
+			fmt.Fprintf(bot.conn, "PONG %s\r\n", pongResponse[1])
 		} else if strings.Contains(line, ".tmi.twitch.tv PRIVMSG "+bot.channel) {
 			userdata := strings.Split(line, ".tmi.twitch.tv PRIVMSG "+bot.channel)
 			username := strings.Split(userdata[0], "@")
