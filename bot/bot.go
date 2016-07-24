@@ -6,6 +6,7 @@ import (
         "os"
         "io/ioutil"
         "bufio"
+        "net/textproto"
         "strings"
         "time"
 )
@@ -100,6 +101,9 @@ func main() {
     go ircbot.ConsoleInput()
     ircbot.Connect()
 
+    parser := bufio.NewReader(irc.conn)
+    proto := textproto.NewReader(parser)
+
     pass1, err := ioutil.ReadFile("twitch_pass.txt")
     fmt.Printf("$$$$ %s\n", string(pass1))
 	pass := strings.Replace(string(pass1), "\n", "", 0)
@@ -120,5 +124,15 @@ func main() {
     for {
         ircbot.Message(ircbot.autoMsg)
         time.Sleep(30 * time.Second)
+
+        line, err := proto.ReadLine()
+        if err != nil {
+            break
+        }
+
+        if strings.Contains(line, "PING") {
+            pongResponse := strings.Split(line, "PING ")
+            fmt.Fprintf(ircbot.conn, "PONG %s\r\n", pongResponse[1])
+        }
     }
 }
