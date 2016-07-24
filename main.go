@@ -31,12 +31,12 @@ func runBot() {
 
 	//authenticating w/ twitch auth token
 	pass1, err := ioutil.ReadFile("twitch_pass.txt")
-	fmt.Printf("The password used is: %s\r\n", string(pass1))
-	pass := strings.Replace(string(pass1), "\n", "", 0)
 	if err != nil {
 		fmt.Println("Error reading from twitch_pass.txt.  Maybe it isn't created?")
 		os.Exit(1)
 	}
+	pass := strings.Replace(string(pass1), "\n", "", 0)
+	fmt.Printf("The password used is: %s\r\n", string(pass))
 
 	ircbot.LogIn(pass)
 	go ircbot.AutoMessage()
