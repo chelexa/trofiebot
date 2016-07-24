@@ -3,12 +3,14 @@ package emotemon
 import (
     	"math/rand"
     	"time"
+    	"strconv"
 )
 
 type Emotemon struct {
-        emotemon string
+        emote string
         cp int
-        CaptureCount int
+        health int
+        capturer chan<- string
 }
 
 /*
@@ -33,27 +35,28 @@ func (emotemon *Emotemon) generateEmotemon() {
     rng := rand.New(source)
 
     // Randomly generating the capture value for this emotemon (ensure the value is not 0)
-    capture := rng.Intn(100) + 1
+    capture := rng.Intn(5) + 1
 
     // Set CP
     emotemon.cp = capture
 
     // Set capture count initially to the CP
-    emotemon.CaptureCount = capture
+    emotemon.health = capture
 
-    // Set the emotemon
-    emotemon.emotemon = emotes[rng.Intn(5)]
+    // Set the emote
+    emotemon.emote = emotes[rng.Intn(5)]
 }
 
 /*
 * Creates a new emotemon
 */
-func New() *Emotemon {
+func NewEmotemon(capturer chan<- string) *Emotemon {
 
 	emotemon := &Emotemon {
-                emotemon: "Kappa",
+                emote: "Kappa",
                 cp: 1,
-                CaptureCount: 1,
+                health: 1,
+                capturer: capturer,
         }
 
     emotemon.generateEmotemon()
@@ -61,4 +64,24 @@ func New() *Emotemon {
     return emotemon
 }
 
+func (emotemon *Emotemon) CaptureAttempt(username string, attack int) {
+	emotemon.health -= attack
+	if emotemon.health <= 0 {
+		emotemon.capturer <- username
+	}
+}
+
+func (emotemon *Emotemon) GetEmote() string {
+	return emotemon.emote;
+}
+
+func (emotemon *Emotemon) Found() string {
+	cp := strconv.Itoa(emotemon.cp)
+	return "A wild " + emotemon.emote + 
+	" has appeared with CP " + cp
+}
+
+func (emotemon *Emotemon) String() string {
+	return "Emote: " + emotemon.emote + "  CP: " + strconv.Itoa(emotemon.cp)
+}
 
