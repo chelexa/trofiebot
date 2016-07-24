@@ -2,6 +2,14 @@
 
 IRC chat bot for Twitch.tv writen in Go.
 
+# Setup
+
+1. Clone the repo
+2. Make a ```twitch_pass.txt``` file in the **bot** folder
+3. Place your Twitch OAUTH token within ```twitch_pass.txt```
+4. Run ```go install```
+5. Run the program 
+
 # Based On
 
 Thank you to those who have helped us create this bot:
