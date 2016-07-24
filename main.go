@@ -40,8 +40,7 @@ func runBot() {
 
 	ircbot.LogIn(pass)
 	go ircbot.AutoMessage()
-	ircbot.Message("A wild Kappa has appeared with CP 1")
 
 	//run forever :)
-	ircbot.HandleChat()
+	ircbot.Start()
 }

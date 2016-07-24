@@ -8,6 +8,7 @@ import (
 	"os"
 	"strings"
 	"time"
+    "github.com/chelexa/trofiebot/emotemon"
 )
 
 /*
@@ -19,6 +20,7 @@ type Bot struct {
 	name    string
 	channel string
 	conn    net.Conn
+    game    *emotemon.EmotemonGame
 }
 
 /*
@@ -71,11 +73,10 @@ func (bot *Bot) LogIn(pass string) {
 Message sends a string to the chat channel
 */
 func (bot *Bot) Message(message string) {
-	if message == "" {
-		return
-	}
-	fmt.Printf("printing message: %s\r\n", message)
-	fmt.Fprintf(bot.conn, "PRIVMSG "+bot.channel+" :"+message+"\r\n")
+	if message != "" {
+    	fmt.Printf("printing message: %s\r\n", message)
+    	fmt.Fprintf(bot.conn, "PRIVMSG "+bot.channel+" :"+message+"\r\n")
+    }
 }
 
 /*
@@ -105,10 +106,22 @@ func (bot *Bot) AutoMessage() {
 	}
 }
 
+func (bot *Bot) emotemonGame() {
+    gameMessage := make(chan string)
+    bot.game = emotemon.NewEmotemonGame(gameMessage)
+    go bot.game.Start()
+    //defer bot.game.Close()
+
+    for {
+        bot.Message(<- gameMessage)
+    }
+
+}
+
 /*
-HandleChat parses and responds to chat
+handleChat parses and responds to chat
 */
-func (bot *Bot) HandleChat() {
+func (bot *Bot) handleChat() {
 	//Creates the chat reader
 	proto := textproto.NewReader(bufio.NewReader(bot.conn))
 
@@ -128,9 +141,17 @@ func (bot *Bot) HandleChat() {
 			username := strings.Split(userdata[0], "@")
 			usermessage := strings.Replace(userdata[1], " :", "", 1)
 			fmt.Printf(username[1] + ": " + usermessage + "\r\n")
-			if strings.Contains(usermessage, "Kappa") {
-				bot.Message(username[1] + " caught a Kappa")
-			}
+			if strings.Contains(usermessage, bot.game.CurrentEmotemon()) {
+                bot.game.CaptureAttempt(username[1], 1)
+			} else if strings.Contains(usermessage, "LIST"){
+                bot.game.GetTrainerEmotemon(username[1])
+            }
 		}
 	}
+}
+
+func (bot *Bot) Start() {
+    go bot.emotemonGame()
+
+    bot.handleChat()
 }
