@@ -1,6 +1,6 @@
 # trofiebot 
 
-IRC chat bot for Twitch.tv writen in Go.
+IRC chat bot for Twitch.tv written in Go.
 
 # Setup
 
