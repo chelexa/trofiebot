@@ -1,4 +1,4 @@
-# trofiebot 
+# trofiebot
 
 IRC chat bot for Twitch.tv written in Go.
 
@@ -16,3 +16,4 @@ Thank you to those who have helped us create this bot:
 
 - [Base Go IRC Bot](https://github.com/Vaultpls/Twitch-IRC-Bot) >> Thanks [Vaultpls](https://github.com/Vaultpls)
 - [Twitch IRC API](https://github.com/justintv/Twitch-API/blob/master/IRC.md)
+- [Twitch API](https://github.com/justintv/twitch-api)
