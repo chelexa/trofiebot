@@ -20,6 +20,8 @@ func main() {
 	switch command {
 	case "run":
 		runBot()
+	default:
+		fmt.Println("Thanks for running emotemon! Please user the `run` flag to enable the chat interaction mode.")
 	}
 }
 
