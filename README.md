@@ -10,10 +10,16 @@ Features:
 # Setup
 
 1. Clone the repo
-2. Make a ```twitch_pass.txt``` file in the **$GOPATH/bin** folder
-3. Place your Twitch OAUTH token within ```twitch_pass.txt```
-4. Run ```go install``` trofiebot
-5. Run trofiebot
+2. Configure the bot:
+  1. Edit `bot/bot.go`:
+    - Add your bots name (*Twitch Name*)
+    - Add the desired Twitch chat channel
+  2. Make a `twitch_pass.txt` file in the **$GOPATH/bin** folder
+  3. Place your Twitch OAUTH token (corresponding to the bot's Twitch name) within `twitch_pass.txt`
+3. Run `go install` trofiebot
+4. Log on to the Twitch chat channel (To see the messages! BibleThump)
+5. Run `./trofiebot run` from within **$GOPATH/bin**
+  - Why? Needs to access the `twitch_pass.txt` 
 
 # Based On
 
