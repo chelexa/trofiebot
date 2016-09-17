@@ -1,6 +1,11 @@
-# trofiebot
+# Trofiebot/Emotemon
 
-IRC chat bot for Twitch.tv written in Go.
+IRC chat bot for Twitch.tv written in Go. Make a Pokemon Go'ish game out of the Twitch emotes.
+
+Features:
+- [x] Spam to capture
+- [ ] Battle Support
+- [ ] User's Emotemon
 
 # Setup
 
